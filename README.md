@@ -2,6 +2,14 @@
 
 A secure RESTful API for managing notes with user authentication, sharing capabilities, and advanced features.
 
+**🚀 Live Demo:** https://notes-api-l50o.onrender.com
+
+**📚 API Documentation:** https://notes-api-l50o.onrender.com/docs
+
+**Developer:** Varshith (varshithg2004@gmail.com)
+
+---
+
 ## Features
 
 ### Core Features
@@ -16,6 +24,7 @@ A secure RESTful API for managing notes with user authentication, sharing capabi
 - 🔍 **Full-text Search**: Search across note titles and content
 - 📄 **Pagination**: Efficient data loading with skip/limit parameters
 - 🔒 **Comprehensive Security**: Input validation, password hashing, JWT tokens
+- 🤝 **Note Sharing**: Collaborate by sharing notes with other users
 
 ## Quick Start
 
@@ -73,25 +82,32 @@ Interactive API documentation is available at:
 - `GET /about` - API and developer information
 - `GET /` - API status
 
-## Usage Examples
+## Live API Usage
+
+### Base URL
+```
+https://notes-api-l50o.onrender.com
+```
+
+### Usage Examples
 
 ### 1. Register a User
 ```bash
-curl -X POST "http://localhost:8000/signup" \
+curl -X POST "https://notes-api-l50o.onrender.com/register" \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password123"}'
 ```
 
 ### 2. Login
 ```bash
-curl -X POST "http://localhost:8000/login" \
+curl -X POST "https://notes-api-l50o.onrender.com/login" \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password123"}'
 ```
 
 ### 3. Create a Note
 ```bash
-curl -X POST "http://localhost:8000/notes" \
+curl -X POST "https://notes-api-l50o.onrender.com/notes" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title": "My Note", "content": "Note content here"}'
@@ -99,7 +115,7 @@ curl -X POST "http://localhost:8000/notes" \
 
 ### 4. Share a Note
 ```bash
-curl -X POST "http://localhost:8000/notes/1/share" \
+curl -X POST "https://notes-api-l50o.onrender.com/notes/1/share" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"share_with_email": "friend@example.com"}'
@@ -107,7 +123,7 @@ curl -X POST "http://localhost:8000/notes/1/share" \
 
 ### 5. Pin a Note
 ```bash
-curl -X POST "http://localhost:8000/notes/1/pin" \
+curl -X POST "https://notes-api-l50o.onrender.com/notes/1/pin" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"is_pinned": true}'
@@ -115,8 +131,13 @@ curl -X POST "http://localhost:8000/notes/1/pin" \
 
 ### 6. Search Notes
 ```bash
-curl -X GET "http://localhost:8000/search?q=keyword" \
+curl -X GET "https://notes-api-l50o.onrender.com/search?q=keyword" \
   -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### 7. Get API Information
+```bash
+curl "https://notes-api-l50o.onrender.com/about"
 ```
 
 ## Database
@@ -138,20 +159,46 @@ DATABASE_URL=postgresql://user:password@localhost:5432/notesdb
 
 ## Deployment
 
-### Using Render, Railway, or similar platforms:
+### Live Deployment
+This API is deployed on **Render.com** and accessible at:
+- **Production URL**: https://notes-api-l50o.onrender.com
+- **API Docs**: https://notes-api-l50o.onrender.com/docs
+- **OpenAPI Spec**: https://notes-api-l50o.onrender.com/openapi.json
 
-1. Push your code to GitHub
-2. Connect your repository to the platform
-3. Set environment variables:
-   - `DATABASE_URL` (if using PostgreSQL)
-   - `SECRET_KEY` (generate a secure random key)
-4. Deploy!
+### Deploy Your Own Instance
 
-### Using Docker (optional):
+#### Using Render.com:
+
+1. Fork this repository
+2. Sign up at https://render.com
+3. Create a new Web Service
+4. Connect your GitHub repository
+5. Configure:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+6. Add environment variables:
+   - `SECRET_KEY` - Generate with: `python -c "import secrets; print(secrets.token_hex(32))"`
+   - `ALGORITHM` - `HS256`
+   - `ACCESS_TOKEN_EXPIRE_MINUTES` - `30`
+   - `DATABASE_URL` - `sqlite:///./notes.db` (or PostgreSQL URL)
+7. Deploy!
+
+#### Using Docker:
 
 ```bash
 docker build -t notes-api .
-docker run -p 8000:8000 notes-api
+docker run -p 8000:8000 -e SECRET_KEY=your-secret-key notes-api
+```
+
+### Environment Variables
+
+Create a `.env` file based on `.env.example`:
+
+```env
+DATABASE_URL=sqlite:///./notes.db
+SECRET_KEY=your-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
 ## Testing
@@ -178,6 +225,44 @@ Test the API using the interactive documentation at `/docs` or use tools like:
 ├── .env.example        # Environment variables template
 └── README.md           # This file
 ```
+
+## Testing
+
+### Interactive Testing
+Visit the live API documentation at https://notes-api-l50o.onrender.com/docs to test all endpoints interactively.
+
+### Automated Testing
+The API has been tested with all required endpoints:
+- ✅ User registration (POST /register) - Returns 201 Created
+- ✅ Duplicate registration - Returns 409 Conflict
+- ✅ User login (POST /login) - Returns JWT token
+- ✅ CRUD operations for notes
+- ✅ Note sharing functionality
+- ✅ Access control and permissions
+- ✅ Search and pagination
+- ✅ Pin/unpin notes
+
+## API Response Codes
+
+- `200 OK` - Successful GET/PUT/POST operations
+- `201 Created` - Successful resource creation
+- `204 No Content` - Successful DELETE operation
+- `400 Bad Request` - Invalid input data
+- `401 Unauthorized` - Invalid/missing authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Resource not found
+- `409 Conflict` - Duplicate resource (e.g., email already registered)
+- `422 Unprocessable Entity` - Validation error
+
+## Contributing
+
+This project was created as part of an internship assignment. Feel free to fork and modify for your own use.
+
+## Developer
+
+**Varshith**
+- Email: varshithg2004@gmail.com
+- GitHub: https://github.com/VarshithGaddam
 
 ## License
 
